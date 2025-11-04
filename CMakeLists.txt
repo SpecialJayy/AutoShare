@@ -3,4 +3,4 @@ project(AutoShare)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(AutoShare main.cpp)
+add_executable(AutoShare main.cpp sqlite3.c)

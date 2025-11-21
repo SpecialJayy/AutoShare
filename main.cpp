@@ -1,11 +1,13 @@
 #include <iostream>
 #include "sqlite3.h"
+
+
 int main() {
     sqlite3* db;
     sqlite3_stmt* stmt;
     const char* sql = "SELECT * FROM logins;";
 
-    if (sqlite3_open("../klienci", &db) != SQLITE_OK) {
+    if (sqlite3_open("../klienci.db", &db) != SQLITE_OK) {
         std::cerr << "X Failed to open database: " << sqlite3_errmsg(db) << std::endl;
         return 1;
     }

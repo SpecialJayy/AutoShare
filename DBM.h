@@ -1,30 +1,32 @@
-//
-// Created by playp on 18/11/2025.
-//
+#ifndef DBM_H
+#define DBM_H
 
-#ifndef AUTOSHARE_DBM_H
-#define AUTOSHARE_DBM_H
-#include <string>
+#include <iostream>
 #include <vector>
+#include <string>
+#include "sqlite3.h"
 
-///definicja Data Base Managment System
+class DBM {
+private:
+    sqlite3* db;
+    std::string dbPath;
 
-namespace std {
-    class DBM {
+public:
+    // Konstruktor
+    DBM(std::string dbName);
+    
+    // Destruktor
+    ~DBM();
 
+    // Metody prywatne
     private:
-        string dbName = "autoshare.db";
-
-    public:
-        //konstruktor
-        DBM(string dbName);
-
-        //metody
-        bool connectDb(const string& dbName);
-        vector<string> loadData(const char* sql);
-        void writeData();
+        bool connectDb();
         void closeDb();
-    };
-} // std
 
-#endif //AUTOSHARE_DBM_H
+    // Metody publiczne
+    public:
+        std::vector<std::string> loadData(const std::string& query);
+        bool writeData(const std::string& query);
+};
+
+#endif

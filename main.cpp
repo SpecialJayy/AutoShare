@@ -1,16 +1,11 @@
 #include <iostream>
-#include "DBM.h"
-#include "sqlite3.h"
+#include "clientManager.h"
 
-DBM DBM("autoshare.db");
 using namespace std;
 
-void showAllCustomers() {
-    DBM.loadData("SELECT * FROM customers");
-}
-
 int main() {
-    showAllCustomers();
+
+    createClient();
 
     return 0;
 }

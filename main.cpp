@@ -12,8 +12,5 @@ void showAllCustomers() {
 int main() {
     showAllCustomers();
 
-    // DBM.writeData("INSERT INTO customers (login, password) VALUES ('jasiu', 'kochampienkosza2');");
-
-
     return 0;
 }

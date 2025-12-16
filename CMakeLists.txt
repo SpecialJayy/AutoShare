@@ -8,4 +8,8 @@ add_executable(AutoShare main.cpp sqlite3.c
         DBM.h
         clientManager.cpp
         clientManager.h
+        Client.cpp
+        Client.h
+        Vehicle.cpp
+        Vehicle.h
 )

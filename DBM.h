@@ -27,6 +27,7 @@ public:
     public:
         std::vector<std::string> loadData(const std::string& query);
         bool writeData(const std::string& query);
+        bool executeQuery(std::string query);
 };
 
 #endif

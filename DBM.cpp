@@ -69,6 +69,11 @@ vector<string> DBM::loadData(const string& query) {
 
 // Funkcja do INSERT / UPDATE / DELETE
 bool DBM::writeData(const string& query) {
+    return executeQuery(query);
+}
+
+//funcja do innych zapytań
+bool DBM::executeQuery(string query) {
     char* errMsg = nullptr;
 
     int rc = sqlite3_exec(db, query.c_str(), nullptr, nullptr, &errMsg);

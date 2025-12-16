@@ -61,7 +61,19 @@ bool editClient(string login, string newLogin, string newPassword) {
     return tryToExecuteQuery(query,"Nie udalo sie edytowac danych uzytkownika");
 }
 
-int login(string login, string password) {
+bool login(string login, string password) {
     string query = "SELECT login FROM customers WHERE password = '" + password +"';";
 
+    vector<string> success = DBM.loadData(query);
+
+    if (success.size() == 0) {
+        cout << "Podano zle haslo lub login" << endl;
+        return false;
+    }
+    if (success.size() == 1) {
+        cout << "zalogowano poprawnie" << endl;
+        return true;
+    }
+    cout << "blad wewnetrzny bazy danych ( prawdopodobnie w bazie znajduja sie 2 uzytkownicy o tych samych danych ) " << endl;
+    return false;
 }

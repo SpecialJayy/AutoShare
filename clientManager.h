@@ -12,6 +12,6 @@ bool removeClient();
 bool editClient();
 
 //logowanie do serwisu
-int login(std::string login, std::string password);
+bool login(std::string login, std::string password);
 
 #endif //AUTOSHARE_CLIENTMANAGER_H

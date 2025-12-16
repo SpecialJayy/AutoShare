@@ -1,19 +1,20 @@
 #include <iostream>
-#include "DBM.h"
-#include "sqlite3.h"
+#include "clientManager.h"
 
-DBM DBM("autoshare.db");
 using namespace std;
 
-void showAllCustomers() {
-    DBM.loadData("SELECT * FROM customers");
-}
-
 int main() {
-    showAllCustomers();
 
-    // DBM.writeData("INSERT INTO customers (login, password) VALUES ('jasiu', 'kochampienkosza2');");
-
+    while (true) {
+        cout<< " Prosze podac komende" << endl;
+        string login;
+        string password;
+        cout << "login: " << endl;
+        cin >> login;
+        cout << "password: " << endl;
+        cin >> password;
+        addClient(login, password);
+    }
 
     return 0;
 }

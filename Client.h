@@ -7,17 +7,18 @@
 
 
 class Client {
-    // Konstruktor
-    Client(int id, std::string login, std::vector<char> driverLicenses, std::vector<Vehicle> rentedVehicles);
-
-    // Destruktor
-    ~Client();
-
     //metody prywatne
     private:
 
     //metody publiczne
     public:
+        // Konstruktory
+        Client(int id, std::string login, std::vector<char> driverLicenses, std::vector<Vehicle> rentedVehicles);
+
+        Client();
+
+        // Destruktor
+        ~Client();
 };
 
 

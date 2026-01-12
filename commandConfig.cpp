@@ -3,10 +3,11 @@
 #include <iostream>
 #include <ostream>
 
+#include "Client.h"
+
 using namespace std;
 
 CommandConfig::CommandConfig() {
-
     //syćkie komendy
     commandMap = {
         {"help", []() {
@@ -22,7 +23,10 @@ CommandConfig::CommandConfig() {
         }},
         {"zakoncz", []() {
             cout << "Dziekujemy za skorzystanie z uslug serwisu AutoShare+ :)" << endl;
-        }}
+        }},
+        {"dane", []() {
+            client.createRaport();
+        }},
     };
 }
 

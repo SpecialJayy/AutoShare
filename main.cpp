@@ -7,9 +7,8 @@
 using namespace std;
 
 int main() {
-    Client loggedInUser();
+    Client loggedInClient;
     CommandConfig commandConfig;
-
     string username;
     string password;
 
@@ -21,7 +20,7 @@ int main() {
 
     if (login(username,password)) {
         cout << "Login successful, you are now logged as " << username << endl;
-        loggedInUser(); // tu koniec
+        createClientClass(loggedInClient,username);
     } else {
         cout << "Login failed" << endl;
     }
@@ -34,7 +33,6 @@ int main() {
         cin >> command;
         commandConfig.commandController(command);
     }
-
 
     return 0;
 }

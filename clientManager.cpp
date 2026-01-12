@@ -1,4 +1,7 @@
 #include "clientManager.h"
+
+#include <bits/parse_numbers.h>
+
 #include "iostream"
 #include "DBM.h"
 
@@ -76,4 +79,35 @@ bool login(string login, string password) {
     }
     cout << "blad wewnetrzny bazy danych ( prawdopodobnie w bazie znajduja sie 2 uzytkownicy o tych samych danych ) " << endl;
     return false;
+}
+
+bool createClientClass (Client& client,const string username){
+    string query = "SELECT * FROM customers WHERE login = '" + username + "';";
+    vector<string> success = DBM.loadData(query);
+
+    if (success.size() == 0) {
+        cout << "Brak uzytkownika " << username << " w bazie danych" << endl;
+        return false;
+    }
+    //tu mamy na 100% klienta
+    client.setId(stoi(success[0]));
+    client.setLogin(success[1]);
+    //celowo nie przypisujemy hasła w obiekcie klienta
+
+    string queryLicenses = "SELECT * FROM driving_license WHERE customer_id = " + success[0] + ";";
+    success = DBM.loadData(queryLicenses);
+
+    vector<char> licenses;
+
+    string lic = "iiabcd";
+
+    for (int i = 2; i <= 5; i++) {
+        if (success[i].data() == "1") {
+            licenses.push_back(lic[i]);
+        }
+    }
+
+    client.setDriverLicenses(licenses);
+
+    return true;
 }

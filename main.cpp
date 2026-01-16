@@ -2,6 +2,7 @@
 
 #include "Client.h"
 #include "clientManager.h"
+#include "Color.h"
 #include "commandConfig.h"
 
 using namespace std;
@@ -12,24 +13,26 @@ int main() {
     string username;
     string password;
 
-    cout<< "Podaj login" << endl;
+    cout<<"Podaj login "<<endl;
     cin >> username;
 
     cout << "Podaj haslo" << endl;
     cin >> password;
 
     if (login(username,password)) {
-        cout << "Login successful, you are now logged as " << username << endl;
+        Color::Lime("Login successful");
+        cout << ", you are now logged as " << endl;
+        Color::Gold(username);
         createClientClass(loggedInClient,username);
     } else {
-        cout << "Login failed" << endl;
+        Color::Red("Login failed");
     }
 
     // komendy do obsługi serwisu
     string command;
     while (command != "zakoncz") {
         cout<< "====================================" << endl;
-        cout<< " Prosze podac komende" << endl;
+        cout<<"Prosze podac komende";
         cin >> command;
         commandConfig.commandController(command);
     }

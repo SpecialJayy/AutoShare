@@ -25,7 +25,7 @@ CommandConfig::CommandConfig() {
             cout << "Dziekujemy za skorzystanie z uslug serwisu AutoShare+ :)" << endl;
         }},
         {"dane", []() {
-            client.createRaport();
+            //client.createRaport();
         }},
     };
 }

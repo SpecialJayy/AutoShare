@@ -8,31 +8,32 @@
 using namespace std;
 
 int main() {
+    Color colorCout; // deklaracja do wypisu konsoli w kolorze colorCout<<"<Rtekst czerwony>"
     Client loggedInClient;
     CommandConfig commandConfig;
     string username;
     string password;
 
-    cout<<"Podaj login "<<endl;
+    colorCout<<"<APodaj login>\n";
     cin >> username;
 
     cout << "Podaj haslo" << endl;
     cin >> password;
 
     if (login(username,password)) {
-        Color::Lime("Login successful");
+        colorCout<<"Login <Gsuccessful>";
         cout << ", you are now logged as " << endl;
-        Color::Gold(username);
+        colorCout<<"<M"<<username<<">";
         createClientClass(loggedInClient,username);
     } else {
-        Color::Red("Login failed");
+        colorCout<<"<CLogin failed>\n";
     }
 
     // komendy do obsługi serwisu
     string command;
     while (command != "zakoncz") {
         cout<< "====================================" << endl;
-        cout<<"Prosze podac komende";
+        colorCout<<"Prosze podac <Lkomende>\n";
         cin >> command;
         commandConfig.commandController(command);
     }

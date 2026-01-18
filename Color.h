@@ -1,27 +1,34 @@
-
 #ifndef UNTITLED_COLOR_H
 #define UNTITLED_COLOR_H
 
+#include <sstream>
+#include <iostream>
 
 class Color {
 private:
-    static void setColor(std::string text,int number);
-    public:
+    std::ostringstream bufor;//strumien wyjsciowy do pamieci, dziala tak jak cout ale zapisuje do pamieci
+    //bufor to tymczasowe miejsce w pamieci do ktorego trafia tekst zanim zostanie wypisany w konsoi
 
-    static void Navy(std::string text);
-    static void Green(std::string text);
-    static void Turqoise(std::string text);
-    static void Crimson(std::string text);
-    static void Purple(std::string text);
-    static void Gold(std::string text);
-    static void Gray(std::string text);
-    static void Blue(std::string text);
-    static void Lime(std::string text);
-    static void Aqua(std::string text);
-    static void Red(std::string text);
-    static void Magenta(std::string text);
-    static void Yellow(std::string text);
-    static void MoreWhite(std::string text);
+public:
+    Color() = default;
+
+    template <typename T> //umozliwia zapis wszyskiego co mozna wypisac cout np int,float,strind itd
+    Color& operator<<(const T& text) {
+        //zapis teksu do zmiennej
+        bufor << text;
+
+        //faktyczne wypisuwanie
+        zakolorujIWypisz();
+        return *this;
+    };
+
+    void clear();
+private:
+    void zakolorujIWypisz();
+
+    void zmienKolor(char kod);
+
+    void resetujKolor();
 };
 
 

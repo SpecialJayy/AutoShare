@@ -2,32 +2,36 @@
 
 #include "Client.h"
 #include "clientManager.h"
+#include "Color.h"
 
 using namespace std;
 
 int main() {
+    Color colorCout; // deklaracja do wypisu konsoli w kolorze colorCout<<"<Rtekst czerwony>"
     Client loggedInClient;
     string username;
     string password;
 
-    cout<< "Podaj login" << endl;
+    colorCout<<"<APodaj login>\n";
     cin >> username;
 
     cout << "Podaj haslo" << endl;
     cin >> password;
 
     if (login(username,password)) {
-        cout << "Login successful, you are now logged as " << username << endl;
+        colorCout<<"Login <Gsuccessful>";
+        cout << ", you are now logged as " << endl;
+        colorCout<<"<M"<<username<<">";
         createClientClass(loggedInClient,username);
     } else {
-        cout << "Login failed" << endl;
+        colorCout<<"<CLogin failed>\n";
     }
 
     // komendy do obsługi serwisu
     string command;
     while (command != "zakoncz") {
         cout<< "====================================" << endl;
-        cout<< " Prosze podac komende" << endl;
+        colorCout<<"Prosze podac <Lkomende>\n";
         cin >> command;
 
         ///komendy

@@ -12,6 +12,4 @@ add_executable(AutoShare main.cpp sqlite3.c
         Client.h
         Vehicle.cpp
         Vehicle.h
-        commandConfig.cpp
-        commandConfig.h
 )

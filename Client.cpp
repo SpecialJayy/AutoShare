@@ -1,5 +1,6 @@
 #include "Client.h"
 #include <iostream>
+#include <windows.h>
 
 Client::Client() {} ;
 // Client::Client(int id, std::string login, std::vector<char> driverLicenses, std::vector<Vehicle> rentedVehicles) {
@@ -30,13 +31,13 @@ void Client::setVehicles(const std::vector<Vehicle> rentedVehicles) {
 //metody
 void Client::createRaport() {
     std::cout << "DANE KLIENTA" << std::endl;
-    std::cout << "Id klienta" << this->id << std::endl;
-    std::cout << "Login klienta" << this->login << std::endl;
-    std::cout << "Posiadane Uprawnienia:" << std::endl;
+    std::cout << "Id klienta ";
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12);
+    std::cout <<  this->id << std::endl;
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),7);
+    std::cout << "Login klienta " << this->login << std::endl;
+    std::cout << "Posiadane Uprawnienia: " << std::endl;
     for (auto license: this->driverLicenses) {
         std::cout << license << std::endl;
     }
 }
-
-
-

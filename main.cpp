@@ -2,13 +2,11 @@
 
 #include "Client.h"
 #include "clientManager.h"
-#include "commandConfig.h"
 
 using namespace std;
 
 int main() {
     Client loggedInClient;
-    CommandConfig commandConfig;
     string username;
     string password;
 
@@ -31,8 +29,27 @@ int main() {
         cout<< "====================================" << endl;
         cout<< " Prosze podac komende" << endl;
         cin >> command;
-        commandConfig.commandController(command);
+
+        ///komendy
+        if (command == "help") {
+            cout << "Dostepne komendy" << endl;
+            cout << "help -- pokazuje dostepne komendy" << endl;
+            cout << "zakoncz -- wylogowywuje z serwisu" << endl;
+            cout << "pojazdy -- pokazuje wypozyczone pojazdy" << endl;
+            cout << "wyloguj -- wylogowywuje uzytkownika i prosi o ponowne zalogowanie" << endl;
+            cout << "lista -- wyswietla liste dostepnych pojazdow" << endl;
+            cout << "wyporzycz -- rozpoczyna proces wyporzyczania pojazdu" << endl;
+            cout << "zwolnij -- oddaje pojazd spowrotem do wyporzyczalni" << endl;
+            cout << "dane -- pokazuje dane klienta" << endl;
+        } else if (command == "dane") {
+            loggedInClient.createRaport();
+        }
+
     }
+
+    //koniec programu
+
+    cout << "Dziekujemy za skorzystanie z naszych uslug :)" << endl;
 
     return 0;
 }

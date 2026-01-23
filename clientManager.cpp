@@ -99,12 +99,19 @@ bool createClientClass (Client& client,const string username){
 
     vector<char> licenses;
 
-    string lic = "iiabcd";
+    string lic = "abcd";
 
+    //jezeli jakies uprawnienie ma 1 w bazie danych, jej index odpowiada charowi z stringu lic
+
+    cout << lic << endl;
     for (int i = 2; i <= 5; i++) {
         if (success[i].data() == "1") {
             licenses.push_back(lic[i]);
         }
+    }
+    cout << "cos" << licenses.size() << endl;
+    for (int i = 0; i < licenses.size(); i++) {
+        cout << licenses[i] << endl;
     }
 
     client.setDriverLicenses(licenses);

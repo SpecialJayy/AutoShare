@@ -46,20 +46,26 @@ vector<string> DBM::loadData(const string& query) {
 
     int colCount = sqlite3_column_count(stmt);
 
-    for (int i = 0; i < colCount; ++i) {
-        cout << sqlite3_column_name(stmt, i) << "\t";
-    }
-    cout << "\n--------------------------\n";
+
+    //służy do sparsowanego wyświetlania///
+
+    // for (int i = 0; i < colCount; ++i) {
+    //     cout << sqlite3_column_name(stmt, i) << "\t";
+    // }
+    // cout << "\n--------------------------\n";
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
         for (int i = 0; i < colCount; ++i) {
             const unsigned char* text = sqlite3_column_text(stmt, i);
             string val = (text ? reinterpret_cast<const char*>(text) : "NULL");
 
-            cout << val << "\t"; // wyswietlanie
+            //służy do sparsowanego wyświetlania///
+            // cout << val << "\t"; // wyswietlanie
             res.push_back(val); //dodawanie do wektora
         }
-        cout << endl;
+
+        //służy do sparsowanego wyświetlania///
+        // cout << endl;
     }
 
     sqlite3_finalize(stmt);

@@ -10,7 +10,7 @@ class Client {
 private:
     int id;
     std::string login;
-    std::vector<char> driverLicenses;
+    char driverLicenses[4]{};
     std::vector<Vehicle> rentedVehicles;
 
     //metody publiczne
@@ -24,11 +24,13 @@ public:
     //settery
     void setId(int id);
     void setLogin(std::string login);
-    void setDriverLicenses(std::vector <char>);
+    void setDriverLicenses(char lic[4]);
     void setVehicles(std::vector<Vehicle>);
 
     //metody
 
-    void createRaport();
+    friend std::ostream& operator <<(std::ostream& os, Client& c);
+
+
 };
 #endif //AUTOSHARE_CLIENT_H

@@ -5,7 +5,7 @@
 #include "Client.h"
 
 //dodawanie klientów do bazy danych
-bool addClient(std::string login , std::string password);
+bool addClient(std::string login , std::string password, char licenses[4]);
 
 //usuwanie klientow z bazy danych
 bool removeClient();

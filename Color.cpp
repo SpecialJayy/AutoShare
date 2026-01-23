@@ -5,12 +5,12 @@ void Color::zakolorujIWypisz()  {
     std::string tekst = bufor.str();
     bufor.str("");
     bufor.clear();
-    for (int i =0;i<tekst.size();i++) {
+    for (int i =0; i < tekst.size(); i++) {
 
-        if (tekst[i]=='<') {
+        if (tekst[i] == '<') {
             zmienKolor(tekst[i+1]);
             i++;
-        }else if (tekst[i]=='>') {
+        }else if ( tekst[i]== '>') {
             resetujKolor();
         }else {
             std::cout << tekst[i];

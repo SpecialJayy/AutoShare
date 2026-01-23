@@ -22,29 +22,50 @@ bool tryToExecuteQuery(string query, string errorMsg) {
     return true;
 }
 
-bool addClient(string login ,string password) {
-    string checkQuery = "SELECT login FROM customers";
-    vector<string> logins = DBM.loadData(checkQuery);
-
-    //sprawdzamy czy uzytkownik juz istnieje
-    for (int i = 0; i < logins.size(); i++) {
-        if (logins[i] == login) {
-        cout << "Uzytkownik o tej nazwie juz istnieje" << endl;
+bool addClient(string login, string password,char licenses[4]) {
+    //patrzymy czy uzytkownik juz istnieje
+    vector<string> logins = DBM.loadData("SELECT login FROM customers");
+    for (const auto& l : logins) {
+        if (l == login) {
+            cout << "Uzytkownik juz istnieje" << endl;
             return false;
         }
     }
 
-    string query = "INSERT INTO customers (login,password) VALUES ('" + login + "', '" + password + "');";
+    //dodanie uzytkownika
+    string queryUser = "INSERT INTO customers (login, password) VALUES ('" + login + "', '" + password + "');";
+    if (!DBM.executeQuery(queryUser)) {
+        cout << "Nie udalo sie dodac klienta do bazy" << endl;
+        return false;
+    }
 
-    return tryToExecuteQuery(query,"Nie udalo sie dodac uzytkownika");
+    //pobranie ID wygenerowanego przez bazę
+    string queryId = "SELECT id FROM customers WHERE login = '" + login + "';";
+    vector<string> res = DBM.loadData(queryId);
+
+    if (res.empty()) return false;
+    string newId = res[0];
+
+    //parsowanie licencji na format bazy (0 lub 1)
+    string catA = "0", catB = "0", catC = "0", catD = "0";
+    for(int i=0; i<4; i++) {
+        if (licenses[i] == 'a') catA = "1";
+        if (licenses[i] == 'b') catB = "1";
+        if (licenses[i] == 'c') catC = "1";
+        if (licenses[i] == 'd') catD = "1";
+    }
+
+    //dodanie licencji
+    string queryLic = "INSERT INTO driving_license (customer_id, cat_a, cat_b, cat_c, cat_d) VALUES (" + newId + ", " + catA + ", " + catB + ", " + catC + ", " + catD + ");";
+    return tryToExecuteQuery(queryLic, "Nie udalo sie utworzyć uzytwkownika");
 }
 
 bool removeClient(string login) {
     string query = "DELETE FROM clients WHERE login == '" + login + "'";
 
     return tryToExecuteQuery(query,"Nie udalo sie usunac uzytkownika");
-
 }
+
 bool editClient(string login, string newLogin, string newPassword) {
     string query;
     if (newPassword.empty() && !newLogin.empty()) {
@@ -74,7 +95,6 @@ bool login(string login, string password) {
         return false;
     }
     if (success.size() == 1) {
-        cout << "zalogowano poprawnie" << endl;
         return true;
     }
     cout << "blad wewnetrzny bazy danych ( prawdopodobnie w bazie znajduja sie 2 uzytkownicy o tych samych danych ) " << endl;
@@ -90,6 +110,7 @@ bool createClientClass (Client& client,const string username){
         return false;
     }
     //tu mamy na 100% klienta
+    //stoi - string to int
     client.setId(stoi(success[0]));
     client.setLogin(success[1]);
     //celowo nie przypisujemy hasła w obiekcie klienta
@@ -97,21 +118,15 @@ bool createClientClass (Client& client,const string username){
     string queryLicenses = "SELECT * FROM driving_license WHERE customer_id = " + success[0] + ";";
     success = DBM.loadData(queryLicenses);
 
-    vector<char> licenses;
+    char licenses[4]{};
 
     string lic = "abcd";
 
     //jezeli jakies uprawnienie ma 1 w bazie danych, jej index odpowiada charowi z stringu lic
-
-    cout << lic << endl;
     for (int i = 2; i <= 5; i++) {
-        if (success[i].data() == "1") {
-            licenses.push_back(lic[i]);
+        if (success[i] == "1") {
+            licenses[i-2] = lic[i-2];
         }
-    }
-    cout << "cos" << licenses.size() << endl;
-    for (int i = 0; i < licenses.size(); i++) {
-        cout << licenses[i] << endl;
     }
 
     client.setDriverLicenses(licenses);

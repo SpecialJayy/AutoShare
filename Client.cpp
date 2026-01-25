@@ -36,6 +36,10 @@ int Client::getVehicleCount() const {
     return this->rentedVehicles.size();
 }
 
+string Client::getLogin() const {
+    return this->login;
+}
+
 //metody
 
 ostream& operator <<(ostream& os,Client& c) {

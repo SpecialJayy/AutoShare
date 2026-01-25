@@ -25,6 +25,13 @@ bool tryToExecuteQuery(string query, string errorMsg) {
 }
 
 bool addClient(string login, string password,char licenses[4]) {
+
+    //sprawdzamy czy login to nie admin
+    if (login  == "admin") {
+        cout << "niepoprawna nazwa uzytkownika " << endl;
+        return false;
+    }
+
     //patrzymy czy uzytkownik juz istnieje
     vector<string> logins = DBM.loadData("SELECT login FROM customers");
     for (const auto& l : logins) {
@@ -294,7 +301,22 @@ bool rentVehicle(Client &client, int id) {
         return false;
     }
 
+    colorCout << "<G Pojaz dostal pomyslnie wypozyczony> \n";
+
     client.addVehicle(v);
+
+    //tworzymy raport i zapisujemy do bazy danych
+
+    string queryRaport = "INSERT INTO raports (renter_id, name, vehicle_id, price, date) VALUES (" +
+                             to_string(client.getId()) + ", '" +
+                             client.getLogin() + "', " +
+                             to_string(id) + ", " +
+                             to_string(price) + ", " +
+                             "DATE('now'));";
+
+    if (!DBM.executeQuery(queryRaport)) {
+        cout << "Blad przy tworzeniu raportu" << endl;
+    }
 
     return true;
 }

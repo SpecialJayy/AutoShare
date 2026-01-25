@@ -33,6 +33,8 @@ public:
 
     int getVehicleCount() const;
 
+    std::string getLogin() const;
+
     //metody
 
     friend std::ostream& operator <<(std::ostream& os, Client& c);

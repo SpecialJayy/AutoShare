@@ -2,17 +2,19 @@
 #include <iostream>
 #include <windows.h>
 
+using namespace std;
+
 Client::Client() {};
 
 Client::~Client() {
-    std::cout << "usunieto klase klienta" << std::endl;
+    cout << "usunieto klase klienta" << endl;
 }
 
 //settery
 void Client::setId(const int id) {
     this->id = id;
 };
-void Client::setLogin(const std::string login) {
+void Client::setLogin(const string login) {
     this->login = login;
 };
 void Client::setDriverLicenses(char lic[4]){
@@ -20,24 +22,55 @@ void Client::setDriverLicenses(char lic[4]){
         this->driverLicenses[i] = lic[i];
     }
 };
-void Client::setVehicles(const std::vector<Vehicle> rentedVehicles) {
-    this->rentedVehicles = rentedVehicles;
+
+//gettery
+const char* Client::getDriverLicenses() const {
+    return driverLicenses;
+}
+
+int Client::getId() const {
+    return id;
+}
+
+int Client::getVehicleCount() const {
+    return this->rentedVehicles.size();
 }
 
 //metody
 
-std::ostream& operator <<(std::ostream& os,Client& c) {
-    std::cout << "DANE KLIENTA" << std::endl;
-    std::cout << "Id klienta ";
+ostream& operator <<(ostream& os,Client& c) {
+    cout << "DANE KLIENTA" << endl;
+    cout << "Id klienta ";
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),12);
-    std::cout <<  c.id << std::endl;
+    cout <<  c.id << endl;
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE),7);
-    std::cout << "Login klienta " << c.login << std::endl;
-    std::cout << "Posiadane Uprawnienia: " << std::endl;
+    cout << "Login klienta " << c.login << endl;
+    cout << "Posiadane Uprawnienia: " << endl;
     for (char license: c.driverLicenses) {
         if (license !=0) {
-            std::cout << "kat." << license << std::endl;
+            cout << "kat." << license << endl;
         }
     }
     return os;
+}
+
+void Client::addVehicle(Vehicle* v) {
+    this->rentedVehicles.push_back(v);
+}
+
+bool Client::returnVehicle(int vehicleId) {
+    for (int i = 0; i < rentedVehicles.size(); i++) {
+        if (rentedVehicles[i]->getId() == vehicleId) {
+            delete rentedVehicles[i];
+            rentedVehicles.erase(rentedVehicles.begin() + i);
+            return true;
+        }
+    }
+    return false;
+}
+
+void Client::listVehicles() {
+    for (int i = 0; i < this->rentedVehicles.size(); i++) {
+        this->rentedVehicles[i]->printInfo();
+    }
 }

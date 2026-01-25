@@ -14,4 +14,8 @@ add_executable(AutoShare main.cpp sqlite3.c
         Vehicle.h
         Color.cpp
         Color.h
+        Car.h
+        Bike.h
+        Truck.h
+        Bus.h
 )

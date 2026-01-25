@@ -1,9 +1,11 @@
 #include "clientManager.h"
-
-#include <bits/parse_numbers.h>
-
+#include "Bike.h"
+#include "Bus.h"
+#include "Car.h"
 #include "iostream"
 #include "DBM.h"
+#include "Truck.h"
+#include <cctype>
 
 using namespace std;
 
@@ -101,7 +103,53 @@ bool login(string login, string password) {
     return false;
 }
 
-bool createClientClass (Client& client,const string username){
+// Funkcja zwraca wektor wskaźników do nowo utworzonych pojazdów
+vector<Vehicle*> parseDatabaseResultToVehicles(const vector<string>& dbData) {
+    vector<Vehicle*> vehicles;
+
+    // Walidacja danych wejściowych
+    if (dbData.empty()) return vehicles;
+    if (dbData.size() % 8 != 0) {
+        cout << "Blad spójnosci danych pojazdow (niepodzielne przez 8)" << endl;
+        return vehicles;
+    }
+
+    // Pętla parsująca
+    for (size_t i = 0; i < dbData.size() / 8; i++) {
+        size_t increment = 8 * i;
+
+        try {
+            int id = stoi(dbData[0 + increment]);
+            string brand = dbData[2 + increment];
+            string model = dbData[3 + increment];
+            int horsepower = stoi(dbData[4 + increment]);
+            string fuelType = dbData[5 + increment];
+            int year = stoi(dbData[6 + increment]);
+            char license = dbData[7 + increment][0];
+
+            Vehicle* v = nullptr;
+
+            switch (license) {
+                case 'A': v = new Bike(id, brand, model, horsepower, fuelType, year); break;
+                case 'B': v = new Car(id, brand, model, horsepower, fuelType, year); break;
+                case 'C': v = new Truck(id, brand, model, horsepower, fuelType, year); break;
+                case 'D': v = new Bus(id, brand, model, horsepower, fuelType, year); break;
+                default: cout << "Nieznany typ: " << license << endl; break;
+            }
+
+            if (v != nullptr) {
+                vehicles.push_back(v);
+            }
+        } catch (...) {
+            cout << "Blad parsowania rekordu pojazdu numer " << i << endl;
+        }
+    }
+
+    return vehicles;
+}
+
+// 1. Funkcja pomocnicza: Pobranie podstawowych danych klienta (ID, Login)
+bool loadClientData(Client& client, const string& username, string& outClientId) {
     string query = "SELECT * FROM customers WHERE login = '" + username + "';";
     vector<string> success = DBM.loadData(query);
 
@@ -109,27 +157,158 @@ bool createClientClass (Client& client,const string username){
         cout << "Brak uzytkownika " << username << " w bazie danych" << endl;
         return false;
     }
-    //tu mamy na 100% klienta
-    //stoi - string to int
+
+    // tu mamy na 100% klienta
+    // stoi - string to int
+    // success[0] = id klienta
+    outClientId = success[0]; // Zapisujemy ID do zmiennej pomocniczej
     client.setId(stoi(success[0]));
     client.setLogin(success[1]);
-    //celowo nie przypisujemy hasła w obiekcie klienta
+    // celowo nie przypisujemy hasła w obiekcie klienta
 
-    string queryLicenses = "SELECT * FROM driving_license WHERE customer_id = " + success[0] + ";";
-    success = DBM.loadData(queryLicenses);
+    return true;
+}
+
+// 2. Funkcja pomocnicza: Pobranie i przypisanie licencji
+bool loadClientLicenses(Client& client, const string& clientId) {
+    string queryLicenses = "SELECT * FROM driving_license WHERE customer_id = " + clientId + ";";
+    vector<string> success = DBM.loadData(queryLicenses);
+
+    // Zabezpieczenie, gdyby nie bylo rekordu w tabeli driving_license
+    if (success.empty()) return false;
 
     char licenses[4]{};
-
     string lic = "abcd";
 
-    //jezeli jakies uprawnienie ma 1 w bazie danych, jej index odpowiada charowi z stringu lic
+    // jezeli jakies uprawnienie ma 1 w bazie danych, jej index odpowiada charowi z stringu lic
     for (int i = 2; i <= 5; i++) {
-        if (success[i] == "1") {
+        // Sprawdzamy zakres, żeby nie wywaliło segfaulta
+        if (i < success.size() && success[i] == "1") {
             licenses[i-2] = lic[i-2];
         }
     }
 
     client.setDriverLicenses(licenses);
+    return true;
+}
 
+// 3. Funkcja pomocnicza: Pobranie pojazdów przypisanych do klienta
+bool loadClientVehicles(Client& client, const string& clientId) {
+    string queryVehicles = "SELECT * FROM vehicles WHERE id_renter = " + clientId + ";";
+    vector<string> rawData = DBM.loadData(queryVehicles);
+
+    vector<Vehicle*> parsedVehicles = parseDatabaseResultToVehicles(rawData);
+
+    for (Vehicle* v : parsedVehicles) {
+        client.addVehicle(v);
+    }
+
+    return true;
+}
+
+// Główna funkcja
+bool createClientClass(Client& client, const string username) {
+    string clientId;
+
+    // Każdy etap musi zwrócić true, żeby przejść dalej
+    if (!loadClientData(client, username, clientId)) {
+        return false;
+    }
+
+    if (!loadClientLicenses(client, clientId)) {
+        return false;
+    }
+
+    if (!loadClientVehicles(client, clientId)) {
+        return false;
+    }
+
+    return true;
+}
+
+void listAllAvailableVehicles() {
+    string query = "SELECT * FROM vehicles WHERE id_renter = 0;";
+    vector<string> rawData = DBM.loadData(query);
+
+    vector<Vehicle*> availableVehicles = parseDatabaseResultToVehicles(rawData);
+
+    if (availableVehicles.empty()) {
+        cout << "Brak dostepnych pojazdow." << endl;
+        return;
+    }
+
+    for (Vehicle* v : availableVehicles) {
+        (*v).printInfo();
+    }
+
+    //musimy usunac obiekty aby zapobiec memory leakowi
+    for (Vehicle* v : availableVehicles) {
+        delete v;
+    }
+}
+
+bool rentVehicle(Client &client, int id) {
+    string query = "SELECT * FROM vehicles WHERE id = " + to_string(id) + ";";
+    vector<string> rawData = DBM.loadData(query);
+
+    if (rawData.empty()) {
+        cout << "Nie ma takiego pojazdu." << endl;
+        return false;
+    }
+
+    if (stoi(rawData[1]) != 0) {
+        colorCout << "<R Pojazd jest niedostepny> \n";
+        return false;
+    }
+
+    vector<Vehicle*> vehicles = parseDatabaseResultToVehicles(rawData);
+    if (vehicles.empty()) return false;
+
+    Vehicle* v = vehicles[0]; // Mamy pewnosc ze jest jeden wynik
+
+    char requiredLicense = rawData[7][0];
+    const char* clientLicenses = client.getDriverLicenses();
+    bool hasPermission = false;
+
+    for (int i = 0; i < 4; i++) {
+        if (std::tolower(clientLicenses[i]) == std::tolower(requiredLicense)) {
+            hasPermission = true;
+            break;
+        }
+    }
+
+    if (!hasPermission) {
+        colorCout << "<R Nie posiadasz wymaganych uprawnien > \n";
+        delete v;
+        return false;
+    }
+
+    double price = v->calculateRentalPrice();
+    cout << "Cena za wypozyczenie: " << price << " PLN" << endl;
+
+    string queryLend = "UPDATE vehicles SET id_renter = " + to_string(client.getId()) + " WHERE id = " + to_string(id) + ";";
+
+    if (!DBM.executeQuery(queryLend)) {
+        cout << "Blad bazy danych. Transakcja anulowana." << endl;
+        delete v;
+        return false;
+    }
+
+    client.addVehicle(v);
+
+    return true;
+}
+
+bool returnVehicle(Client &client, int id) {
+    string query = "UPDATE vehicles SET id_renter = 0 WHERE id = " + to_string(id) + ";";
+
+    if (!tryToExecuteQuery(query, "Blad bazy danych podczas zwrotu pojazdu")) {
+        return false;
+    }
+
+    if (client.returnVehicle(id)) {
+        cout << "Pojazd o ID " << id << " zostal pomyslnie zwrocony." << endl;
+        return true;
+    }
     return true;
 }

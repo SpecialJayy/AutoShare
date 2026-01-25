@@ -60,12 +60,12 @@ vector<string> DBM::loadData(const string& query) {
             string val = (text ? reinterpret_cast<const char*>(text) : "NULL");
 
             //służy do sparsowanego wyświetlania///
-            // cout << val << "\t"; // wyswietlanie
+            //cout << val << "\t";
             res.push_back(val); //dodawanie do wektora
         }
 
         //służy do sparsowanego wyświetlania///
-        // cout << endl;
+        //cout << endl;
     }
 
     sqlite3_finalize(stmt);
@@ -90,6 +90,6 @@ bool DBM::executeQuery(string query) {
         return false;
     }
 
-    cout << "Query executed successfully " << endl;
+    // cout << "Query executed successfully " << endl;
     return true;
 }

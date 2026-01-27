@@ -472,3 +472,24 @@ bool editClient(int id, string newLogin, string newPassword, string newLicenseSt
 
     return true;
 }
+
+void listAllVehicles() {
+    string query = "SELECT * FROM vehicles";
+    vector<string> rawData = DBM.loadData(query);
+
+    vector<Vehicle*> availableVehicles = parseDatabaseResultToVehicles(rawData);
+
+    if (availableVehicles.empty()) {
+        cout << "Brak dostepnych pojazdow." << endl;
+        return;
+    }
+
+    for (Vehicle* v : availableVehicles) {
+        (*v).printInfo();
+    }
+
+    //musimy usunac obiekty aby zapobiec memory leakowi
+    for (Vehicle* v : availableVehicles) {
+        delete v;
+    }
+}

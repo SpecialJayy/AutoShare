@@ -23,7 +23,6 @@ add_executable(AutoShare
         clientManager.h
         Client.cpp
         Client.h
-        Vehicle.cpp
         Vehicle.h
         Color.cpp
         Color.h

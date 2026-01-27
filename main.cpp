@@ -187,7 +187,11 @@ int main() {
             else if (command == "lista") {
                 cout << "Dostepne pojazdy do wypozyczenia:" << endl;
                 printHeader();
-                listAllAvailableVehicles();
+                if (isAdmin) {
+                    listAllVehicles();
+                } else {
+                    listAllAvailableVehicles();
+                }
             }
             else if (command == "wypozycz" && !isAdmin) {
                 int id = getIntInput("Prosze podac ID pojazdu, ktory chce Pan/Pani wypozyczyc: ");

@@ -22,6 +22,9 @@ bool createClientClass(Client& client,std::string username);
 //wyswietlanie wszystkich dostepnych do wynajecia pojazdow
 void listAllAvailableVehicles();
 
+//wyswietlenie wszystkich pojazdow nawet tych wypozyczonych
+void listAllVehicles();
+
 //wypozyczanie pojazdu
 bool rentVehicle(Client& client, int id);
 

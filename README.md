@@ -46,6 +46,10 @@ Aplikacja działa poprawnie jeżeli w konsoli wyświetli się prośba o zalogowa
 
 AutoShare++ to konsolowa aplikacja, więc wszelkie interakcje nawiązuje się poprzez wpisywanie komend do konsoli.
 
+Użyć programu można albo poprzez pobranie najnowszej wersji (exe)
+
+lub bezpośrednio z Cliona. ⚠️ W tym celu należy zedytować konfiguracje i w miejsce `Working Directory` wkleić ścieżke do głównego folderu projektu ⚠️
+
 Przykład komendy
 
 `help`

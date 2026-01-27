@@ -16,6 +16,7 @@ set(CMAKE_EXE_LINKER_FLAGS "-static")
 add_executable(AutoShare
         main.cpp
         sqlite3.c
+        resources.rc
         DBM.cpp
         DBM.h
         clientManager.cpp

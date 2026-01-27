@@ -2,12 +2,19 @@
 #include <iostream>
 #include <windows.h>
 
+#include "Bike.h"
+
 using namespace std;
 
 Client::Client() {};
 
 Client::~Client() {
-    cout << "usunieto klase klienta" << endl;
+    Color colorCout;
+    for (Vehicle* v : this->rentedVehicles) {
+        delete v;
+    }
+    this->rentedVehicles.clear();
+    colorCout << "<GWylogowano pomyslnie>\n";
 }
 
 //settery

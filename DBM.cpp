@@ -19,7 +19,7 @@ DBM::~DBM() {
 }
 
 bool DBM::connectDb() {
-    if (sqlite3_open(("../" + dbPath).c_str(), &db) != SQLITE_OK) {
+    if (sqlite3_open(dbPath.c_str(), &db) != SQLITE_OK) {
         cerr << "X Failed to open database: " << sqlite3_errmsg(db) << endl;
         return false;
     }

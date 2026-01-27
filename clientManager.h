@@ -8,7 +8,7 @@
 bool addClient(std::string login , std::string password, char licenses[4]);
 
 //usuwanie klientow z bazy danych
-bool removeClient();
+bool removeClient(std::string&);
 
 //edytowanie danych klienta
 bool editClient();
@@ -27,5 +27,14 @@ bool rentVehicle(Client& client, int id);
 
 //oddawanie pojazdu
 bool returnVehicle(Client &client, int id);
+
+//wyswietlanie klientow
+bool viewAllClients();
+
+//wyswietlanie raportow
+bool viewAllRaports();
+
+//edycja danych klienta
+bool editClient(int id, std::string newLogin, std::string newPassword, std::string newLicenseStr);
 
 #endif //AUTOSHARE_CLIENTMANAGER_H

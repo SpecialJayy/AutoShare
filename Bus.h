@@ -19,6 +19,7 @@ public:
     }
 
     void printInfo() const override {
+        Color colorCout;
         Vehicle::printInfo();
         technicalSpecs.specs();
         colorCout << "Typ: <P Autobus> \n";

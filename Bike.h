@@ -4,7 +4,6 @@
 
 #include "Color.h"
 #include "Vehicle.h"
-Color colorCout;
 
 class Bike : public Vehicle {
     public:
@@ -22,6 +21,7 @@ class Bike : public Vehicle {
 
 
     void printInfo() const override {
+        Color colorCout;
         Vehicle::printInfo();
         technicalSpecs.specs();
         colorCout << "Typ: <N Motocykl> \n";

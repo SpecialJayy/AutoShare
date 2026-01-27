@@ -6,6 +6,8 @@
 #include "DBM.h"
 #include "Truck.h"
 #include <cctype>
+#include <iomanip>
+Color colorCout;
 
 using namespace std;
 
@@ -69,33 +71,16 @@ bool addClient(string login, string password,char licenses[4]) {
     return tryToExecuteQuery(queryLic, "Nie udalo sie utworzyć uzytwkownika");
 }
 
-bool removeClient(string login) {
-    string query = "DELETE FROM clients WHERE login == '" + login + "'";
 
-    return tryToExecuteQuery(query,"Nie udalo sie usunac uzytkownika");
-}
-
-bool editClient(string login, string newLogin, string newPassword) {
-    string query;
-    if (newPassword.empty() && !newLogin.empty()) {
-        //edycja tylko loginu
-        //UPDATE your_table_name
-        //SET login = :newLogin
-        //WHERE login = :oldLogin
-        query = "UPDATE customers SET login = '" + newLogin + "' WHERE login = '" + login + "'; ";
-    } else if (!newPassword.empty() && newLogin.empty()) {
-        //nowe haslo
-        query = "UPDATE customers SET password = '" + newPassword + "' WHERE login = '" + login + "'; ";
-    } else if (!newLogin.empty() && !newPassword.empty()) {
-        query = "UPDATE customers SET password = '" + newPassword + "' WHERE login = '" + login + "';" + query = "UPDATE customers SET login = '" + newLogin + "' WHERE login = '" + login + "'; ";
-        //nowy login i haslo
-    }
-
-    return tryToExecuteQuery(query,"Nie udalo sie edytowac danych uzytkownika");
-}
 
 bool login(string login, string password) {
-    string query = "SELECT login FROM customers WHERE password = '" + password +"';";
+
+    //logowanie do panelu admina
+    if (login == "admin" && password == "admin") {
+        return true;
+    }
+
+    string query = "SELECT login FROM customers WHERE password = '" + password +"' AND login = '" + login + "';";
 
     vector<string> success = DBM.loadData(query);
 
@@ -273,6 +258,11 @@ bool rentVehicle(Client &client, int id) {
 
     Vehicle* v = vehicles[0]; // Mamy pewnosc ze jest jeden wynik
 
+    //dla bezpieczenstwa usuwamy jesli z jakiegos powodu z bazy danych by zwrocilo wiecej niz 1 pojazd
+    for (size_t i = 1; i < vehicles.size(); i++) {
+        delete vehicles[i];
+    }
+
     char requiredLicense = rawData[7][0];
     const char* clientLicenses = client.getDriverLicenses();
     bool hasPermission = false;
@@ -301,7 +291,7 @@ bool rentVehicle(Client &client, int id) {
         return false;
     }
 
-    colorCout << "<G Pojaz dostal pomyslnie wypozyczony> \n";
+    colorCout << "<G Pojazd dostal pomyslnie wypozyczony> \n";
 
     client.addVehicle(v);
 
@@ -322,6 +312,14 @@ bool rentVehicle(Client &client, int id) {
 }
 
 bool returnVehicle(Client &client, int id) {
+    //sprawdzamy czy uzytkownik ma uprawnienia do zwolnienia pojazdu
+    string checkQuery = "SELECT id FROM vehicles WHERE id = " + to_string(id) + " AND id_renter = " + to_string(client.getId()) + ";";
+    vector<string> res = DBM.loadData(checkQuery);
+    if (res.size() == 0) {
+        colorCout << "<C Pojaz nie jest wypozyczony lub brak odpowiednich uprawnien> \n";
+        return false;
+    }
+
     string query = "UPDATE vehicles SET id_renter = 0 WHERE id = " + to_string(id) + ";";
 
     if (!tryToExecuteQuery(query, "Blad bazy danych podczas zwrotu pojazdu")) {
@@ -332,5 +330,145 @@ bool returnVehicle(Client &client, int id) {
         cout << "Pojazd o ID " << id << " zostal pomyslnie zwrocony." << endl;
         return true;
     }
+    return true;
+}
+
+// komendy administratora
+
+bool viewAllClients() {
+    // Używamy LEFT JOIN, żeby wyświetlić klienta nawet jak nie ma rekordu licencji
+    string query = "SELECT c.id, c.login, c.password, d.cat_a, d.cat_b, d.cat_c, d.cat_d "
+                   "FROM customers c "
+                   "LEFT JOIN driving_license d ON c.id = d.customer_id;";
+
+    vector<string> res = DBM.loadData(query);
+
+    if (res.empty()) {
+        cout << "<C Brak uzytkownikow w bazie>" << endl;
+        return false;
+    }
+
+    int cols = 7;
+
+    if (res.size() % cols != 0) {
+        cout << "<R Blad spojnosci danych>" << endl;
+        return false;
+    }
+
+    // Iterujemy co 7 elementów
+    for (size_t i = 0; i < res.size(); i += cols) {
+        string id = res[i];
+        string login = res[i+1];
+        string password = res[i+2];
+
+        // Budujemy stringa z uprawnieniami (np. "A B")
+        string perms = "";
+        if (res[i+3] == "1") perms += "A";
+        if (res[i+4] == "1") perms += "B";
+        if (res[i+5] == "1") perms += "C";
+        if (res[i+6] == "1") perms += "D";
+
+        if (perms.empty()) perms = "-"; // Jak nie ma nic, wstawiamy kreskę
+
+        cout << " "
+             << left << setw(6) << id << "| "
+             << setw(20) << login << "| "
+             << setw(20) << password << "| "
+             << setw(12) << perms
+             << endl;
+    }
+
+    return true;
+}
+
+bool viewAllRaports() {
+    string query = "SELECT id, renter_id, name, vehicle_id, price, date FROM raports";
+    vector<string> res = DBM.loadData(query);
+
+    if (res.size() == 0) {
+        colorCout << "<C Brak raportow w bazie >\n";
+        return false;
+    }
+
+    int cols = 6;
+    if (res.size() % cols != 0) {
+        colorCout << "<R Blad spojnosci danych raportow>\n";
+        return false;
+    }
+
+    for (size_t i = 0; i < res.size(); i += cols) {
+        string id = res[i];
+        string renterId = res[i+1];
+        string name = res[i+2];
+        string vehicleId = res[i+3];
+        string price = res[i+4];
+        string date = res[i+5];
+
+        cout << " "
+             << left << setw(6) << id << "| "
+             << setw(11) << renterId << "| "
+             << setw(15) << name << "| "
+             << setw(11) << vehicleId << "| "
+             << setw(10) << (price + " zl") << "| "
+             << setw(12) << date
+             << endl;
+    }
+
+    return true;
+}
+
+bool removeClient(string& login) {
+    string query = "DELETE FROM customers WHERE login = '" + login + "'";
+
+    return tryToExecuteQuery(query,"Nie udalo sie usunac uzytkownika");
+}
+
+bool editClient(int id, string newLogin, string newPassword, string newLicenseStr) {
+    bool updateUsers = false;
+    string queryUsers = "UPDATE customers SET ";
+
+    if (!newLogin.empty()) {
+        queryUsers += "login = '" + newLogin + "'";
+        updateUsers = true;
+    }
+
+    if (!newPassword.empty()) {
+        if (updateUsers) queryUsers += ", ";
+        queryUsers += "password = '" + newPassword + "'";
+        updateUsers = true;
+    }
+
+    queryUsers += " WHERE id = " + to_string(id) + ";";
+
+    if (updateUsers) {
+        if (!tryToExecuteQuery(queryUsers, "Blad edycji danych uzytkownika")) {
+            cout << "wystapil blad" << endl;
+            return false;
+        }
+    }
+
+    if (!newLicenseStr.empty()) {
+        string catA = "0", catB = "0", catC = "0", catD = "0";
+
+        for (char c : newLicenseStr) {
+            c = tolower(c);
+            if (c == 'a') catA = "1";
+            else if (c == 'b') catB = "1";
+            else if (c == 'c') catC = "1";
+            else if (c == 'd') catD = "1";
+        }
+
+        string queryLic = "UPDATE driving_license SET "
+                          "cat_a=" + catA + ", "
+                          "cat_b=" + catB + ", "
+                          "cat_c=" + catC + ", "
+                          "cat_d=" + catD +
+                          " WHERE customer_id=" + to_string(id) + ";";
+
+        if (!tryToExecuteQuery(queryLic, "Blad edycji licencji")) {
+            return false;
+        }
+    }
+
     return true;
 }

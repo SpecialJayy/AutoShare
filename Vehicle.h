@@ -4,6 +4,8 @@
 #include <iostream>
 #include <string>
 
+#include "Color.h"
+
 class Vehicle {
     protected:
     int id;

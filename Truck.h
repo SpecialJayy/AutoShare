@@ -18,6 +18,7 @@ class Truck : public Vehicle {
     }
 
     void printInfo() const override {
+        Color colorCout;
         Vehicle::printInfo();
         technicalSpecs.specs();
         colorCout << "Typ: <Y Samochod Ciezarowy> \n";
